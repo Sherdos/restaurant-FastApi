@@ -1,10 +1,15 @@
 
-
-
+from fastapi import HTTPException
+from fastapi.responses import JSONResponse
+from sqlalchemy import delete, insert, select, update
+from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from .models import menu
+from .utils import get_menu_db, get_menus_db, add_menu_db, update_menu_db
+from src.database import get_async_session
 
-from .schemas import Menu
+from .schemas import CreateMenu, GetMenu
 
 
 router = APIRouter(
@@ -12,35 +17,39 @@ router = APIRouter(
     tags = ["Menu"]
 )
 
-menus = []
 
 
 
-@router.get('/menus',response_model=List[Menu])
-async def get_menus():
-    return menus
+@router.get('/menus') 
+async def get_menus(session: AsyncSession = Depends(get_async_session)):
+    menus_list = get_menus_db(session)
+    return menus_list
 
 
-@router.get('/menus/{menu_id}', response_model=Menu)
-async def get_menu(menu_id:int):
-    return [ i for i in menus if i['id'] == menu_id ]
+@router.get('/menus/{menu_id}')
+async def get_menu(menu_id:int, session: AsyncSession = Depends(get_async_session)):
+    specific_menu = await get_menu_db(session, menu_id)
+    return specific_menu
 
 
-@router.post('/menus', response_model=Menu)
-async def add_menu(menu:Menu):    
-    menus.append(menu)
-    return {'added':menus}
+@router.post('/menus')
+async def add_menu(new_menu:CreateMenu, session: AsyncSession = Depends(get_async_session)):   
+    add_menu = add_menu_db(session, new_menu)
+    return JSONResponse(content=add_menu, status_code=201)
 
 
-@router.patch('/menus/{target_menu_id}', response_model=Menu)
-async def update_menu(target_menu_id, menu:Menu):
-    new_menu = menus[2]
-    new_menu['title'] = menu.title
-    new_menu['description'] = menu.description
-    return new_menu
+
+@router.patch('/menus/{menu_id}')
+async def update_menu(menu_id: int, updated_menu: CreateMenu, session: AsyncSession = Depends(get_async_session)):
+    await update_menu_db(session, updated_menu, menu_id)
+    edit_menu = await get_menu_db(session, menu_id)
+    return edit_menu
 
 
-@router.delete('/menus/{target_menu_id}', response_model=Menu)
-async def delete_menu(target_menu_id):
-    deleted_menu = menus.pop(1)
-    return {'status':200, 'data':deleted_menu}
+
+@router.delete('/menus/{menu_id}')
+async def delete_menu(menu_id:int, session: AsyncSession = Depends(get_async_session)):
+    stmt = delete(menu).where(menu.c.id == menu_id)
+    result = await session.execute(stmt)
+    await session.commit()
+    return {'status':'success'}

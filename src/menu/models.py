@@ -2,11 +2,12 @@ from sqlalchemy import MetaData, TIMESTAMP, Integer, String, Table, ForeignKey, 
 
 metadata = MetaData()
 
+
 menu = Table(
 
     "menu",
     metadata,
-    Column("id", Integer, primary_key=True),
+    Column("id", Integer, primary_key=True, autoincrement=True),
     Column("title", String),
     Column("description", String),
 
