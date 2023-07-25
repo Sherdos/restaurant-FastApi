@@ -1,38 +1,38 @@
-from sqlalchemy import MetaData, TIMESTAMP, Integer, String, Table, ForeignKey, Column
 
-metadata = MetaData()
-
-
-menu = Table(
-
-    "menu",
-    metadata,
-    Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("title", String),
-    Column("description", String),
-
-)
-
-submenu = Table(
-    
-    "submenu",
-    metadata,
-    Column("id", Integer, primary_key=True),
-    Column("title", String),
-    Column("description", String),
-    Column("menu_id", Integer, ForeignKey('menu.id', ondelete='CASCADE')),
-
-)
+from sqlalchemy import String, ForeignKey, Column, UUID
+import uuid
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import DeclarativeBase
 
 
-dishe = Table(
-    
-    "dishe",
-    metadata,
-    Column("id", Integer, primary_key=True),
-    Column("title", String),
-    Column("description", String),
-    Column("price", String),
-    Column("submenu_id", Integer, ForeignKey('submenu.id', ondelete='CASCADE')),
+class Base(DeclarativeBase):
+    pass
 
-)
+class Menu(Base):
+    __tablename__ = "menu"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    title = Column(String(30), unique=True)
+    description = Column(String)
+
+
+
+class Submenu(Base):
+    __tablename__ = "submenu"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    title = Column(String(30), unique=True)
+    description = Column(String)
+    menu_id = Column(UUID(as_uuid=True), ForeignKey('menu.id', ondelete='CASCADE'))
+
+
+class Dish(Base):
+    __tablename__ = "dish"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    title = Column(String(30), unique=True)
+    description = Column(String)
+    price = Column(String)
+    submenu_id = Column(UUID(as_uuid=True), ForeignKey('submenu.id', ondelete='CASCADE'))
+
+

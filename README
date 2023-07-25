@@ -1,0 +1,24 @@
+Restaurant-FastAPI
+
+
+Настройка проекта
+
+1) Создайте вертуального окружение командой python/python3 -m venv env
+2) Активируйте вертуальное окружение командой для Linux, Mac source env/bin/activate или если у вас Windows .\env\Scripts\activate
+3) Скачайте все зависимости командой pip install -r requariments.txt
+4) Настройка базыданных. Создайте в корневом каталоге файл .env и запишите в него
+
+                DB_HOST = ххххх
+                DB_PORT = ххххх
+                DB_NAME = ххххх
+                DB_USER = ххххх
+                DB_PASS = ххххх
+
+и заполните своиими данными из базыданных
+
+5) Запустите миграции командой alembic upgrade head
+6) Запустите тест сервер на uvicorn командой uvicorn src.main:app --reload
+
+Все готово
+
+
