@@ -1,0 +1,23 @@
+version: '3.7'  
+
+services:
+  db:
+    image: postgres:15.1-alpine
+    container_name: db_app
+    env_file: .env-non-dev
+
+  app:
+    build:
+      context: .
+
+    env_file: .env-non-dev
+
+    container_name: fastapi_app
+
+    command: ['/restaurant_fastapi/docker/app.sh']
+
+    ports:
+      - 8000:8000
+
+    depends_on:
+      - db
