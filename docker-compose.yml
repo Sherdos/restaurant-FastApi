@@ -5,6 +5,8 @@ services:
     image: postgres:15.1-alpine
     container_name: db_app
     env_file: .env-non-dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   app:
     build:
@@ -21,3 +23,7 @@ services:
 
     depends_on:
       - db
+
+volumes:
+  postgres_data:
+    driver: local
