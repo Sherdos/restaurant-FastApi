@@ -131,10 +131,10 @@ async def get_all_menu_db( session : AsyncSession ):
     
 async def create_menu_db( session: AsyncSession, new_menu ):
 
-    if not await is_title_unique(session, new_menu.dict()['title'], Menu):
+    if not await is_title_unique(session, new_menu.model_dump()['title'], Menu):
         raise HTTPException( status_code=404, detail="the menu already exists" )
     
-    stmt = insert( Menu ).values(**new_menu.dict())
+    stmt = insert( Menu ).values(**new_menu.model_dump())
     result = await session.execute(stmt)
     new_menu_id = result.inserted_primary_key[0]
     await session.commit()
@@ -148,7 +148,7 @@ async def create_menu_db( session: AsyncSession, new_menu ):
 
 async def update_menu_db( session: AsyncSession, updated_menu, menu_id ):
 
-    stmt = update(Menu).values(**updated_menu.dict()).where(Menu.id == menu_id) 
+    stmt = update(Menu).values(**updated_menu.model_dump()).where(Menu.id == menu_id) 
     await session.execute(stmt)
 
     await session.commit()
@@ -214,10 +214,10 @@ async def get_specific_submenu_db(session: AsyncSession, menu_id, submenu_id):
 
 async def create_submenu_db(session, subnew_menu, menu_id):
 
-    if not await is_title_unique(session, subnew_menu.dict()['title'], Submenu):
+    if not await is_title_unique(session, subnew_menu.model_dump()['title'], Submenu):
         raise HTTPException( status_code=404, detail="the submenu already exists" )
     
-    stmt = insert(Submenu).values(**subnew_menu.dict(), menu_id=menu_id)
+    stmt = insert(Submenu).values(**subnew_menu.model_dump(), menu_id=menu_id)
     result = await session.execute(stmt)
 
     new_submenu_id = result.inserted_primary_key[0]
@@ -230,7 +230,7 @@ async def create_submenu_db(session, subnew_menu, menu_id):
 
 async def update_submenu_db(session, updated_submenu, menu_id, submenu_id):
 
-    stmt = update(Submenu).values(**updated_submenu.dict()).where(and_(Submenu.id == submenu_id, Submenu.menu_id == menu_id) )
+    stmt = update(Submenu).values(**updated_submenu.model_dump()).where(and_(Submenu.id == submenu_id, Submenu.menu_id == menu_id) )
     await session.execute(stmt)
 
     await session.commit()
@@ -294,10 +294,10 @@ async def get_specific_dish_db(session: AsyncSession, menu_id, submenu_id, dish_
 
 async def create_dish_db(session, dish_menu, menu_id, submenu_id):
 
-    if not await is_title_unique(session, dish_menu.dict()['title'], Dish):
+    if not await is_title_unique(session, dish_menu.model_dump()['title'], Dish):
         raise HTTPException( status_code=404, detail="the dish already exists" )
 
-    stmt = insert(Dish).values(**dish_menu.dict(), submenu_id=submenu_id)
+    stmt = insert(Dish).values(**dish_menu.model_dump(), submenu_id=submenu_id)
     result = await session.execute(stmt)
 
     new_dish_id = result.inserted_primary_key[0]
@@ -312,7 +312,7 @@ async def create_dish_db(session, dish_menu, menu_id, submenu_id):
 
 async def update_dish_db(session, updated_dish, menu_id, submenu_id, dish_id):
 
-    stmt = update(Dish).values(**updated_dish.dict()).where(and_(Dish.submenu_id == submenu_id, Dish.id == dish_id))
+    stmt = update(Dish).values(**updated_dish.model_dump()).where(and_(Dish.submenu_id == submenu_id, Dish.id == dish_id))
 
     await session.execute(stmt)
 

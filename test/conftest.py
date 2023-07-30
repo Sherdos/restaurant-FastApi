@@ -1,17 +1,16 @@
 from typing import AsyncGenerator
+from httpx import AsyncClient
+from fastapi.testclient import TestClient
 from sqlalchemy import NullPool
-from src.config import DB_TEST_HOST, DB_TEST_NAME, DB_TEST_PASS, DB_TEST_PORT, DB_TEST_USER
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
+
+from src.config import DB_TEST_HOST, DB_TEST_NAME, DB_TEST_PASS, DB_TEST_PORT, DB_TEST_USER
 from src.database import get_async_session
 from src.menu.models import Base
-
-from fastapi.testclient import TestClient
-from httpx import AsyncClient
 from src.main import app
 
 import pytest
-
 import asyncio
 
 
@@ -49,7 +48,6 @@ def event_loop(request):
     yield loop
     loop.close()
 
-client = TestClient(app)
 
 @pytest.fixture(scope="session")
 async def ac() -> AsyncGenerator[AsyncClient, None]:

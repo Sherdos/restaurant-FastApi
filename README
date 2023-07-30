@@ -3,21 +3,17 @@ Restaurant-FastAPI
 
 Настройка проекта
 
-1) Создайте вертуального окружение командой 'python/python3 -m venv env'
-2) Активируйте вертуальное окружение командой для Linux, Mac 'source env/bin/activate' или если у вас Windows '.\env\Scripts\activate'
-3) Скачайте все зависимости командой 'pip install -r requirements.txt '
-4) Настройка базыданных. Создайте в корневом каталоге файл .env и запишите в него
+Для запуска проекта 
 
-                DB_HOST = ххххх
-                DB_PORT = ххххх
-                DB_NAME = ххххх
-                DB_USER = ххххх
-                DB_PASS = ххххх
-
-и заполните своиими данными из базыданных
-
-5) Запустите миграции командой 'alembic upgrade head'
-6) Запустите тест сервер на uvicorn командой ' uvicorn src.main:app --reload '
+1) Соберите docker-compose командой "docker-compose -f docker-compose.yml build"
+2) Запустите docker-compose командой "docker-compose -f docker-compose.yml up" добавите " -d " для скрытия дебуга
+3) Перейдите по этой ссылке "http://127.0.0.1:8000/"
 
 Все готово
 
+Для запуска Тестов 
+
+1) Соберите docker-compose командой "docker-compose -f docker-compose-test.yml build"
+2) Запустите docker-compose командой "docker-compose -f docker-compose-test.yml run app_test"
+
+В консоли покажутся результаты тестов

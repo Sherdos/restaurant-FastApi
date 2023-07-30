@@ -1,0 +1,14 @@
+FROM python:3.10-slim
+
+RUN mkdir /restaurant_fastapi_test
+
+WORKDIR /restaurant_fastapi_test
+
+COPY requirements.txt . 
+
+RUN pip install -r requirements.txt
+
+
+COPY . .
+
+RUN chmod +x docker/test.sh
