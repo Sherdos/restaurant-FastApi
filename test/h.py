@@ -1,0 +1,1 @@
+from src.config import DB_TEST_HOST, DB_TEST_NAME, DB_TEST_PASS, DB_TEST_PORT, DB_TEST_USER
