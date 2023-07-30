@@ -78,5 +78,6 @@ async def test_delete_submenu(ac: AsyncClient):
     assert result.status_code == 200
 
 
-
+async def test_delete_all(ac: AsyncClient):
+    await ac.delete(f'/api/v1/menus/{submenu_menu_id}')
 

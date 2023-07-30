@@ -17,8 +17,8 @@ services:
 
     command: ['/restaurant_fastapi_test/docker/test.sh']
 
-    ports:
-      - 8000:8000
 
     depends_on:
       - db_test
+
+    restart: 'no'

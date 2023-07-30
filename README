@@ -14,6 +14,6 @@ Restaurant-FastAPI
 Для запуска Тестов 
 
 1) Соберите docker-compose командой "docker-compose -f docker-compose-test.yml build"
-2) Запустите docker-compose командой "docker-compose -f docker-compose-test.yml run app_test"
+2) Запустите docker-compose командой "docker-compose -f docker-compose-test.yml up"
 
-В консоли покажутся результаты тестов
+В консоли покажутся результаты тестов чтобы выйти нажмите на 'Ctrl + C'

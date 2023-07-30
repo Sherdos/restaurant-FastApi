@@ -4,6 +4,10 @@ menu_id = ''
 menu_title = ''
 menu_description = ''
 
+async def test_get_list_menu_empty(ac: AsyncClient):
+    result = await ac.get('/api/v1/menus/')
+    assert result.status_code == 200
+    assert len(result.json()) == 0
 
 async def test_create_menu(ac: AsyncClient):
 
@@ -15,7 +19,7 @@ async def test_create_menu(ac: AsyncClient):
         "title": "My menu 1",
         "description": "My menu description 1"
     })
-
+    
     menu_id = result.json()['id']
     menu_title = result.json()['title']
     menu_description = result.json()['description']
