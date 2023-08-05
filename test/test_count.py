@@ -43,8 +43,8 @@ async def test_get_specific_menu(ac: AsyncClient):
 
     assert result.status_code == 200
     assert menu_id == result.json()['id']
-    assert 1 == result.json()['submenus_count']
     assert 2 == result.json()['dishes_count']
+    assert 1 == result.json()['submenus_count']
 
 
 
