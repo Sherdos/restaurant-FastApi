@@ -14,15 +14,15 @@ async def test_create_submenu(ac: AsyncClient):
     global submenu_menu_id
 
     result_menu = await ac.post('/api/v1/menus/', json={
-        "title": "My menu 1",
-        "description": "My menu description 1"
+        'title': 'My menu 1',
+        'description': 'My menu description 1'
     })
 
     submenu_menu_id = result_menu.json()['id']
 
     result = await ac.post(f'/api/v1/menus/{submenu_menu_id}/submenus', json={
-        "title": "My submenu 1",
-        "description": "My submenu description 1"
+        'title': 'My submenu 1',
+        'description': 'My submenu description 1'
     })
 
     submenu_id = result.json()['id']
@@ -56,8 +56,8 @@ async def test_update_submenu(ac: AsyncClient):
     global submenu_description
 
     result = await ac.patch(f'/api/v1/menus/{submenu_menu_id}/submenus/{submenu_id}', json={
-        "title": "My updated submenu 1",
-        "description": "My updated submenu description 1"
+        'title': 'My updated submenu 1',
+        'description': 'My updated submenu description 1'
     })
     assert result.status_code == 200
 
@@ -71,7 +71,6 @@ async def test_update_submenu(ac: AsyncClient):
     assert submenu_description == result.json()['description']
 
 
-
 async def test_delete_submenu(ac: AsyncClient):
 
     result = await ac.delete(f'/api/v1/menus/{submenu_menu_id}/submenus/{submenu_id}')
@@ -80,4 +79,3 @@ async def test_delete_submenu(ac: AsyncClient):
 
 async def test_delete_all(ac: AsyncClient):
     await ac.delete(f'/api/v1/menus/{submenu_menu_id}')
-

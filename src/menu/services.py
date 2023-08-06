@@ -1,89 +1,50 @@
+from uuid import UUID
 
-from src.menu.models import Dish, Menu, Submenu
-from src.menu.repositories import DishRepository, MenuRepository, SubmenuRepository
 from fastapi import Depends
+from fastapi_cache.decorator import cache
 
-from src.menu.schemas import GetMenu
+from src.menu.base.base_service import BaseService
+from src.menu.repositories import DishRepository, MenuRepository, SubmenuRepository
+from src.menu.schemas import GetDish, GetMenu, GetSubmenu
 
 
-class MenuService:
-
+class MenuService(BaseService):
 
     def __init__(self, db_repository: MenuRepository = Depends()) -> None:
-        self.db_repository = db_repository
+        super().__init__(db_repository, ['menu_list', 'menu'])
 
-    async def all(self):
-        result = await self.db_repository.get_all()
-        print(result)
-        return [ Menu.json_mapping(i) for i in result ]
-    
-    async def get(self, id):
-        result = await self.db_repository.get(id)
-        return Menu.json_mapping(result)
-        
-    async def create(self, **kwargs):
-        result = await self.db_repository.create(**kwargs)
-        return await self.get(result)
-    
-    async def update(self, menu_id, **kwargs):
-        await self.db_repository.update(menu_id, **kwargs)
-        return await self.get(menu_id)
-    
-    async def delete(self, menu_id):
-        result = await self.db_repository.delete(menu_id)
-        return result
+    @cache(expire=30, namespace='menu_list')
+    async def all(self) -> list[GetMenu]:
+        return await super().all()
+
+    @cache(expire=30, namespace='menu')
+    async def get(self, id: UUID) -> GetMenu:
+        return await super().get(id)
 
 
-class SubmenuService:
-
+class SubmenuService(BaseService):
 
     def __init__(self, db_repository: SubmenuRepository = Depends()) -> None:
-        self.db_repository = db_repository
+        super().__init__(db_repository, ['submenu_list', 'submenu'])
 
-    async def all(self, menu_id):
-        result = await self.db_repository.get_all(menu_id)
-        return [ Submenu.json_mapping(i) for i in result ]
-    
-    async def get(self,menu_id, id):
-        result = await self.db_repository.get(menu_id, id)
-        return Submenu.json_mapping(result)
-        
-    async def create(self, menu_id, **kwargs):
-        result = await self.db_repository.create(menu_id=menu_id, **kwargs)
-        return await self.get(menu_id, result)
-    
-    async def update(self, menu_id, id, **kwargs):
-        await self.db_repository.update(id, **kwargs)
-        return await self.get(menu_id, id)
-    
-    async def delete(self, id):
-        result = await self.db_repository.delete(id)
-        return result
+    @cache(expire=30, namespace='submenu_list')
+    async def all(self) -> list[GetSubmenu]:
+        return await super().all()
+
+    @cache(expire=30, namespace='submenu')
+    async def get(self, id: UUID) -> GetSubmenu:
+        return await super().get(id)
 
 
-
-class DishService:
-
+class DishService(BaseService):
 
     def __init__(self, db_repository: DishRepository = Depends()) -> None:
-        self.db_repository = db_repository
+        super().__init__(db_repository, ['dish_list', 'dish'])
 
-    async def all(self, submenu_id):
-        result = await self.db_repository.get_all(submenu_id)
-        return [ Dish.json_mapping(i) for i in result ]
-    
-    async def get(self, submenu_id, id):
-        result = await self.db_repository.get(submenu_id, id)
-        return Dish.json_mapping(result)
-        
-    async def create(self, submenu_id, **kwargs):
-        result = await self.db_repository.create(submenu_id = submenu_id,**kwargs)
-        return await self.get(submenu_id, result)
-    
-    async def update(self, submenu_id, id, **kwargs):
-        await self.db_repository.update(id, **kwargs)
-        return await self.get(submenu_id, id)
-    
-    async def delete(self, id):
-        result = await self.db_repository.delete(id)
-        return result
+    @cache(expire=30, namespace='dish_list')
+    async def all(self) -> list[GetDish]:
+        return await super().all()
+
+    @cache(expire=30, namespace='dish')
+    async def get(self, id: UUID) -> GetDish:
+        return await super().get(id)

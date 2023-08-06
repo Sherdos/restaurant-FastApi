@@ -1,11 +1,6 @@
-
-
-
-
 from uuid import UUID
+
 from pydantic import BaseModel, Field
-
-
 
 '''
 
@@ -13,27 +8,30 @@ Get
 
 '''
 
+
 class Base(BaseModel):
-    
-    title:str = Field(max_length=25)
-    description:str
+
+    title: str = Field(max_length=25)
+    description: str
+
 
 class BaseGet(Base):
-    id:UUID
+    id: UUID
+
 
 class GetMenu(BaseGet):
-    submenus_count:int
-    dishes_count:int
+    submenus_count: int
+    dishes_count: int
 
 
 class GetSubmenu(BaseGet):
-    menu_id:UUID
-    dishes_count:int
+    menu_id: UUID
+    dishes_count: int
+
 
 class GetDish(BaseGet):
-    price:str
-    submenu_id:UUID
-
+    price: str
+    submenu_id: UUID
 
 
 '''
@@ -42,10 +40,10 @@ Create
 
 '''
 
+
 class CreateMenu(Base):
     pass
 
 
 class CreateDish(Base):
-    price:str
-
+    price: str

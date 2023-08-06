@@ -1,10 +1,20 @@
-version: '3.7'  
+version: '3.7'
 
 services:
   db_test:
     image: postgres:15.1-alpine
     container_name: db_app_test
+    command: -p 1221
+    expose:
+      - 1221
     env_file: .env-test
+
+  redis_test:
+    image: redis:7
+    container_name: redis_app_test
+    command: --port 5370
+    expose:
+      - 5370
 
   app_test:
     build:
@@ -20,5 +30,6 @@ services:
 
     depends_on:
       - db_test
+      - redis_test
 
     restart: 'no'

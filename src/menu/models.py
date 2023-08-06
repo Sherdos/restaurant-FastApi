@@ -1,6 +1,6 @@
-
-from sqlalchemy import String, ForeignKey, Column, UUID
 import uuid
+
+from sqlalchemy import UUID, Column, ForeignKey, String
 from sqlalchemy.orm import DeclarativeBase
 
 from src.menu.schemas import GetDish, GetMenu, GetSubmenu
@@ -9,48 +9,44 @@ from src.menu.schemas import GetDish, GetMenu, GetSubmenu
 class Base(DeclarativeBase):
     pass
 
+
 class Menu(Base):
-    __tablename__ = "menu"
+    __tablename__ = 'menu'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String(30), unique=True)
     description = Column(String)
 
-    @staticmethod
-    def json_mapping(item):
-        menu = item[0]
+    def json_mapping(self, item: tuple) -> GetMenu:
         return GetMenu(
-                    id=menu.id, 
-                    title=menu.title, 
-                    description=menu.description, 
-                    submenus_count=item[-2], 
-                    dishes_count=item[-1]
-                ) 
+            id=self.id,
+            title=self.title,
+            description=self.description,
+            submenus_count=item[-2],
+            dishes_count=item[-1]
+        )
 
 
 class Submenu(Base):
-    __tablename__ = "submenu"
+    __tablename__ = 'submenu'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String(30), unique=True)
     description = Column(String)
     menu_id = Column(UUID(as_uuid=True), ForeignKey('menu.id', ondelete='CASCADE'))
 
-    @staticmethod
-    def json_mapping(item):
-        submenu:Submenu = item[0]
+    def json_mapping(self, item: tuple) -> GetSubmenu:
         return GetSubmenu(
-                    id=submenu.id, 
-                    title=submenu.title, 
-                    description=submenu.description, 
-                    menu_id=submenu.menu_id,
-                    dishes_count=item[-1]
-                ) 
-
+            id=self.id,
+            title=self.title,
+            description=self.description,
+            menu_id=self.menu_id,
+            dishes_count=item[-1]
+        )
 
 
 class Dish(Base):
-    __tablename__ = "dish"
+    __tablename__ = 'dish'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String(30), unique=True)
@@ -58,15 +54,11 @@ class Dish(Base):
     price = Column(String)
     submenu_id = Column(UUID(as_uuid=True), ForeignKey('submenu.id', ondelete='CASCADE'))
 
-    @staticmethod
-    def json_mapping(item):
-        dish:Dish = item[0]
+    def json_mapping(self, item=None) -> GetDish:
         return GetDish(
-                    id=dish.id, 
-                    title=dish.title, 
-                    description=dish.description, 
-                    price=dish.price,
-                    submenu_id=dish.submenu_id
-                ) 
-
-        
+            id=self.id,
+            title=self.title,
+            description=self.description,
+            price=self.price,
+            submenu_id=self.submenu_id
+        )

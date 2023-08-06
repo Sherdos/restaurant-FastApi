@@ -8,7 +8,7 @@ dish_submenu_id = ''
 dish_submenu_menu_id = ''
 
 
-async def test_create_dish(ac: AsyncClient):
+async def test_create_dish(ac: AsyncClient, menu_data, submenu_data, dish_data):
 
     global dish_id
     global dish_title
@@ -17,24 +17,14 @@ async def test_create_dish(ac: AsyncClient):
     global dish_price
     global dish_submenu_menu_id
 
-    result_menu = await ac.post('/api/v1/menus/', json={
-        "title": "My menu 1",
-        "description": "My menu description 1"
-    })
+    result_menu = await ac.post('/api/v1/menus/', json=menu_data)
     dish_submenu_menu_id = result_menu.json()['id']
 
-    result_submenu = await ac.post(f'/api/v1/menus/{dish_submenu_menu_id}/submenus', json={
-        "title": "My submenu 1",
-        "description": "My submenu description 1"
-    })
+    result_submenu = await ac.post(f'/api/v1/menus/{dish_submenu_menu_id}/submenus', json=submenu_data)
 
     dish_submenu_id = result_submenu.json()['id']
 
-    result = await ac.post(f'/api/v1/menus/{dish_submenu_menu_id}/submenus/{dish_submenu_id}/dishes', json={
-        "title": "My dish 1",
-        "description": "My dish description 1",
-        "price": "12.50"
-    })
+    result = await ac.post(f'/api/v1/menus/{dish_submenu_menu_id}/submenus/{dish_submenu_id}/dishes', json=dish_data)
 
     dish_id = result.json()['id']
     dish_title = result.json()['title']
@@ -71,9 +61,9 @@ async def test_update_dish(ac: AsyncClient):
     global dish_price
 
     result = await ac.patch(f'/api/v1/menus/{dish_submenu_menu_id}/submenus/{dish_submenu_id}/dishes/{dish_id}', json={
-        "title": "My updated submenu 1",
-        "description": "My updated submenu description 1",
-        "price":"14.22"
+        'title': 'My updated submenu 1',
+        'description': 'My updated submenu description 1',
+        'price': '14.22'
     })
     assert result.status_code == 200
 
@@ -90,7 +80,6 @@ async def test_update_dish(ac: AsyncClient):
     assert dish_price == result.json()['price']
 
 
-
 async def test_delete_dish(ac: AsyncClient):
 
     result = await ac.delete(f'/api/v1/menus/{dish_submenu_menu_id}/submenus/{dish_submenu_id}/dishes/{dish_id}')
@@ -99,8 +88,3 @@ async def test_delete_dish(ac: AsyncClient):
 
 async def test_delete_all(ac: AsyncClient):
     await ac.delete(f'/api/v1/menus/{dish_submenu_menu_id}')
-
-
-
-
-
