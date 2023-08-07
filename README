@@ -1,5 +1,15 @@
-Restaurant-FastAPI
+# Restaurant-FastAPI
 
+[![python](https://img.shields.io/badge/python-3.10_slim-blue?style=flat-square)](https://www.python.org/)
+[![fastapi](https://img.shields.io/badge/fastapi-0.100.0-critical?style=flat-square)](https://fastapi.tiangolo.com/)
+[![pytest](https://img.shields.io/badge/pytest-passed-brightgreen)](https://docs.pytest.org/en/7.4.x/)
+
+
+## Описание
+
+Образовательный проект FastAPI для Y_Lab. Это серверная служба для ресторанов с операциями меню CRUD. Есть три сущности: Меню, Подменю, Блюда.
+Документацию можно найти по адресу (http://0.0.0.0:8000/docs,
+http://localhost:8000/docs или http://127.0.0.1:8000/docs)
 
 Настройка проекта
 
