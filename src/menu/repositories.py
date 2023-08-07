@@ -1,5 +1,7 @@
+from uuid import UUID
+
 from fastapi import Depends
-from sqlalchemy import distinct, func, select
+from sqlalchemy import and_, distinct, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
@@ -21,20 +23,26 @@ class MenuRepository(BaseRepository):
 
 
 class SubmenuRepository(BaseRepository):
-    def __init__(self, session: AsyncSession = Depends(get_async_session)) -> None:
+    def __init__(self, menu_id: UUID, session: AsyncSession = Depends(get_async_session)) -> None:
         super().__init__(session=session)
         self.model = Submenu
         self.query = select(
             self.model,
             func.count(distinct(Dish.id).label('dishes_count')),
-        ).outerjoin(Dish, self.model.id == Dish.submenu_id)
+        ).outerjoin(Dish, self.model.id == Dish.submenu_id).where(Submenu.menu_id == menu_id)
         self.name = 'submenu'
 
 
 class DishRepository(BaseRepository):
 
-    def __init__(self, session: AsyncSession = Depends(get_async_session),) -> None:
+    def __init__(self, menu_id: UUID, submenu_id: UUID, session: AsyncSession = Depends(get_async_session)) -> None:
         super().__init__(session=session)
         self.model = Dish
-        self.query = select(self.model)
+        self.menu_id = menu_id
+        self.submenu_id = submenu_id
+        self.query = select(self.model).where(and_(
+            self.model.submenu_id == Submenu.id,
+            Submenu.id == self.submenu_id,
+            Submenu.menu_id == self.menu_id
+        ))
         self.name = 'dish'

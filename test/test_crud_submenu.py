@@ -1,81 +1,49 @@
 from httpx import AsyncClient
 
-submenu_id = ''
-submenu_title = ''
-submenu_description = ''
-submenu_menu_id = ''
 
+class TestMenu:
 
-async def test_create_submenu(ac: AsyncClient):
+    def setup_class(self):
+        self.submenu_id = ''
+        self.submenu_title = ''
+        self.submenu_description = ''
+        self.submenu_menu_id = ''
 
-    global submenu_id
-    global submenu_title
-    global submenu_description
-    global submenu_menu_id
+    async def test_crud_submenu(self, ac: AsyncClient, menu_data, submenu_data, update_submenu_data):
 
-    result_menu = await ac.post('/api/v1/menus/', json={
-        'title': 'My menu 1',
-        'description': 'My menu description 1'
-    })
+        result_menu = await ac.post('/api/v1/menus/', json=menu_data)
 
-    submenu_menu_id = result_menu.json()['id']
+        assert result_menu.status_code == 201
+        self.submenu_menu_id = result_menu.json()['id']
 
-    result = await ac.post(f'/api/v1/menus/{submenu_menu_id}/submenus', json={
-        'title': 'My submenu 1',
-        'description': 'My submenu description 1'
-    })
+        result = await ac.post(f'/api/v1/menus/{self.submenu_menu_id}/submenus', json=submenu_data)
 
-    submenu_id = result.json()['id']
-    submenu_title = result.json()['title']
-    submenu_description = result.json()['description']
+        assert result.status_code == 201
+        self.submenu_id = result.json()['id']
+        self.submenu_title = result.json()['title']
+        self.submenu_description = result.json()['description']
 
-    assert submenu_id == result.json()['id']
-    assert submenu_title == result.json()['title']
-    assert submenu_description == result.json()['description']
-    assert result.status_code == 201
+        result = await ac.get(f'/api/v1/menus/{self.submenu_menu_id}/submenus/{self.submenu_id}')
+        assert result.status_code == 200
 
+        assert self.submenu_id == result.json()['id']
+        assert self.submenu_title == result.json()['title']
+        assert self.submenu_description == result.json()['description']
 
-async def test_get_list_submenu(ac: AsyncClient):
-    result = await ac.get(f'/api/v1/menus/{submenu_menu_id}/submenus')
-    assert result.status_code == 200
-    assert len(result.json()) == 1
+        result = await ac.patch(f'/api/v1/menus/{self.submenu_menu_id}/submenus/{self.submenu_id}', json=update_submenu_data)
+        assert result.status_code == 200
 
+        assert self.submenu_title != result.json()['title']
+        assert self.submenu_description != result.json()['description']
 
-async def test_get_specific_submenu(ac: AsyncClient):
-    result = await ac.get(f'/api/v1/menus/{submenu_menu_id}/submenus/{submenu_id}')
-    assert result.status_code == 200
+        self.submenu_title = result.json()['title']
+        self.submenu_description = result.json()['description']
 
-    assert submenu_id == result.json()['id']
-    assert submenu_title == result.json()['title']
-    assert submenu_description == result.json()['description']
+        result = await ac.delete(f'/api/v1/menus/{self.submenu_menu_id}/submenus/{self.submenu_id}')
+        assert result.status_code == 200
 
+        result = await ac.get(f'/api/v1/menus/{self.submenu_menu_id}/submenus')
+        assert result.status_code == 200
+        assert len(result.json()) == 0
 
-async def test_update_submenu(ac: AsyncClient):
-
-    global submenu_title
-    global submenu_description
-
-    result = await ac.patch(f'/api/v1/menus/{submenu_menu_id}/submenus/{submenu_id}', json={
-        'title': 'My updated submenu 1',
-        'description': 'My updated submenu description 1'
-    })
-    assert result.status_code == 200
-
-    assert submenu_title != result.json()['title']
-    assert submenu_description != result.json()['description']
-
-    submenu_title = result.json()['title']
-    submenu_description = result.json()['description']
-
-    assert submenu_title == result.json()['title']
-    assert submenu_description == result.json()['description']
-
-
-async def test_delete_submenu(ac: AsyncClient):
-
-    result = await ac.delete(f'/api/v1/menus/{submenu_menu_id}/submenus/{submenu_id}')
-    assert result.status_code == 200
-
-
-async def test_delete_all(ac: AsyncClient):
-    await ac.delete(f'/api/v1/menus/{submenu_menu_id}')
+        await ac.delete(f'/api/v1/menus/{self.submenu_menu_id}')

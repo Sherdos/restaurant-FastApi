@@ -87,3 +87,28 @@ async def dish_data():
         'description': 'My dish description 1',
         'price': '12.50'
     }
+
+
+@pytest.fixture
+async def update_menu_data():
+    return {
+        'title': 'My updated menu 1',
+        'description': 'My updated menu description 1'
+    }
+
+
+@pytest.fixture
+async def update_submenu_data():
+    return {
+        'title': 'My updated submenu 1',
+        'description': 'My updated submenu description 1'
+    }
+
+
+@pytest.fixture
+async def update_dish_data():
+    return {
+        'title': 'My updated submenu 1',
+        'description': 'My updated submenu description 1',
+        'price': '14.22'
+    }

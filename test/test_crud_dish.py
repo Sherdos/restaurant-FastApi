@@ -1,90 +1,55 @@
 from httpx import AsyncClient
 
-dish_id = ''
-dish_title = ''
-dish_description = ''
-dish_price = ''
-dish_submenu_id = ''
-dish_submenu_menu_id = ''
 
+class TestMenu:
 
-async def test_create_dish(ac: AsyncClient, menu_data, submenu_data, dish_data):
+    def setup_class(self):
+        self.dish_id = ''
+        self.dish_title = ''
+        self.dish_description = ''
+        self.dish_price = ''
+        self.dish_submenu_id = ''
+        self.dish_submenu_menu_id = ''
 
-    global dish_id
-    global dish_title
-    global dish_description
-    global dish_submenu_id
-    global dish_price
-    global dish_submenu_menu_id
+    async def test_crud_submenu(self, ac: AsyncClient, menu_data, submenu_data, dish_data, update_dish_data):
 
-    result_menu = await ac.post('/api/v1/menus/', json=menu_data)
-    dish_submenu_menu_id = result_menu.json()['id']
+        result_menu = await ac.post('/api/v1/menus/', json=menu_data)
+        self.dish_submenu_menu_id = result_menu.json()['id']
 
-    result_submenu = await ac.post(f'/api/v1/menus/{dish_submenu_menu_id}/submenus', json=submenu_data)
+        result_submenu = await ac.post(f'/api/v1/menus/{self.dish_submenu_menu_id}/submenus', json=submenu_data)
+        self.dish_submenu_id = result_submenu.json()['id']
 
-    dish_submenu_id = result_submenu.json()['id']
+        result = await ac.post(f'/api/v1/menus/{self.dish_submenu_menu_id}/submenus/{self.dish_submenu_id}/dishes', json=dish_data)
 
-    result = await ac.post(f'/api/v1/menus/{dish_submenu_menu_id}/submenus/{dish_submenu_id}/dishes', json=dish_data)
+        assert result.status_code == 201
+        self.dish_id = result.json()['id']
+        self.dish_title = result.json()['title']
+        self.dish_description = result.json()['description']
+        self.dish_price = result.json()['price']
 
-    dish_id = result.json()['id']
-    dish_title = result.json()['title']
-    dish_description = result.json()['description']
-    dish_price = result.json()['price']
+        result = await ac.get(f'/api/v1/menus/{self.dish_submenu_menu_id}/submenus/{self.dish_submenu_id}/dishes/{self.dish_id}')
+        assert result.status_code == 200
+        assert self.dish_id == result.json()['id']
+        assert self.dish_title == result.json()['title']
+        assert self.dish_description == result.json()['description']
+        assert self.dish_price == result.json()['price']
 
-    assert dish_id == result.json()['id']
-    assert dish_title == result.json()['title']
-    assert dish_description == result.json()['description']
-    assert dish_price == result.json()['price']
-    assert result.status_code == 201
+        result = await ac.patch(f'/api/v1/menus/{self.dish_submenu_menu_id}/submenus/{self.dish_submenu_id}/dishes/{self.dish_id}', json=update_dish_data)
+        assert result.status_code == 200
 
+        assert self.dish_title != result.json()['title']
+        assert self.dish_description != result.json()['description']
+        assert self.dish_price != result.json()['price']
 
-async def test_get_list_dish(ac: AsyncClient):
-    result = await ac.get(f'/api/v1/menus/{dish_submenu_menu_id}/submenus/{dish_submenu_id}/dishes')
-    assert result.status_code == 200
-    assert len(result.json()) == 1
+        self.dish_title = result.json()['title']
+        self.dish_description = result.json()['description']
+        self.dish_price = result.json()['price']
 
+        result = await ac.delete(f'/api/v1/menus/{self.dish_submenu_menu_id}/submenus/{self.dish_submenu_id}/dishes/{self.dish_id}')
+        assert result.status_code == 200
 
-async def test_get_specific_dish(ac: AsyncClient):
-    result = await ac.get(f'/api/v1/menus/{dish_submenu_menu_id}/submenus/{dish_submenu_id}/dishes/{dish_id}')
-    assert result.status_code == 200
+        result = await ac.get(f'/api/v1/menus/{self.dish_submenu_menu_id}/submenus/{self.dish_submenu_id}/dishes')
+        assert result.status_code == 200
+        assert len(result.json()) == 0
 
-    assert dish_id == result.json()['id']
-    assert dish_title == result.json()['title']
-    assert dish_description == result.json()['description']
-    assert dish_price == result.json()['price']
-
-
-async def test_update_dish(ac: AsyncClient):
-
-    global dish_title
-    global dish_description
-    global dish_price
-
-    result = await ac.patch(f'/api/v1/menus/{dish_submenu_menu_id}/submenus/{dish_submenu_id}/dishes/{dish_id}', json={
-        'title': 'My updated submenu 1',
-        'description': 'My updated submenu description 1',
-        'price': '14.22'
-    })
-    assert result.status_code == 200
-
-    assert dish_title != result.json()['title']
-    assert dish_description != result.json()['description']
-    assert dish_price != result.json()['price']
-
-    dish_title = result.json()['title']
-    dish_description = result.json()['description']
-    dish_price = result.json()['price']
-
-    assert dish_title == result.json()['title']
-    assert dish_description == result.json()['description']
-    assert dish_price == result.json()['price']
-
-
-async def test_delete_dish(ac: AsyncClient):
-
-    result = await ac.delete(f'/api/v1/menus/{dish_submenu_menu_id}/submenus/{dish_submenu_id}/dishes/{dish_id}')
-    assert result.status_code == 200
-
-
-async def test_delete_all(ac: AsyncClient):
-    await ac.delete(f'/api/v1/menus/{dish_submenu_menu_id}')
+        await ac.delete(f'/api/v1/menus/{self.dish_submenu_menu_id}')

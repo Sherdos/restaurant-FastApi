@@ -1,80 +1,41 @@
-import pytest
 from httpx import AsyncClient
 
-menu_id = ''
-menu_title = ''
-menu_description = ''
 
+class TestMenu:
+    def setup_class(self):
+        self.id = None
+        self.title = None
+        self.description = None
 
-@pytest.fixture
-async def menu_data():
-    return {
-        'title': 'My menu 1',
-        'description': 'My menu description 1'
-    }
+    async def test_crud_menu(self, ac: AsyncClient, menu_data, update_menu_data):
 
+        menu_list = await ac.get('/api/v1/menus/')
+        assert menu_list.status_code == 200
+        assert menu_list.json() == []
 
-async def test_get_list_menu_empty(ac: AsyncClient):
-    result = await ac.get('/api/v1/menus/')
-    assert result.status_code == 200
-    assert len(result.json()) == 0
+        result = await ac.post('/api/v1/menus/', json=menu_data)
+        assert result.status_code == 201
+        self.id = result.json()['id']
 
+        self.title = result.json()['title']
+        self.description = result.json()['description']
 
-async def test_create_menu(ac: AsyncClient, menu_data):
+        menu = await ac.get(f'/api/v1/menus/{self.id}')
+        assert menu.status_code == 200
+        assert self.title == menu.json()['title']
+        assert self.description == menu.json()['description']
 
-    global menu_id
-    global menu_title
-    global menu_description
+        result = await ac.patch(f'/api/v1/menus/{self.id}', json=update_menu_data)
+        assert result.status_code == 200
+        assert self.title != result.json()['title']
+        assert self.description != result.json()['description']
 
-    result = await ac.post('/api/v1/menus/', json=menu_data)
+        self.title = result.json()['title']
+        self.description = result.json()['description']
 
-    menu_id = result.json()['id']
-    menu_title = result.json()['title']
-    menu_description = result.json()['description']
+        result = await ac.delete(f'/api/v1/menus/{self.id}')
+        assert result.status_code == 200
 
-    assert menu_id == result.json()['id']
-    assert menu_title == result.json()['title']
-    assert menu_description == result.json()['description']
-    assert result.status_code == 201
-
-
-async def test_get_list_menu(ac: AsyncClient):
-    result = await ac.get('/api/v1/menus/')
-    assert result.status_code == 200
-    assert len(result.json()) == 1
-
-
-async def test_get_specific_menu(ac: AsyncClient):
-    result = await ac.get(f'/api/v1/menus/{menu_id}')
-    assert result.status_code == 200
-
-    assert menu_id == result.json()['id']
-    assert menu_title == result.json()['title']
-    assert menu_description == result.json()['description']
-
-
-async def test_update_menu(ac: AsyncClient):
-
-    global menu_title
-    global menu_description
-
-    result = await ac.patch(f'/api/v1/menus/{menu_id}', json={
-        'title': 'My updated menu 1',
-        'description': 'My updated menu description 1'
-    })
-    assert result.status_code == 200
-
-    assert menu_title != result.json()['title']
-    assert menu_description != result.json()['description']
-
-    menu_title = result.json()['title']
-    menu_description = result.json()['description']
-
-    assert menu_title == result.json()['title']
-    assert menu_description == result.json()['description']
-
-
-async def test_delete_menu(ac: AsyncClient):
-
-    result = await ac.delete(f'/api/v1/menus/{menu_id}')
-    assert result.status_code == 200
+        menu_list = await ac.get('/api/v1/menus/')
+        assert menu_list.status_code == 200
+        assert menu_list.json() == []
