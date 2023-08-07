@@ -11,9 +11,9 @@
 Документацию можно найти по адресу (http://0.0.0.0:8000/docs,
 http://localhost:8000/docs или http://127.0.0.1:8000/docs)
 
-Настройка проекта
+## Настройка проекта
 
-Для запуска проекта
+## Для запуска проекта
 
 1) Соберите docker-compose командой "docker-compose -f docker-compose.yml build"
 2) Запустите docker-compose командой "docker-compose -f docker-compose.yml up" добавите " -d " для скрытия дебуга
@@ -21,7 +21,7 @@ http://localhost:8000/docs или http://127.0.0.1:8000/docs)
 
 Все готово
 
-Для запуска Тестов
+## Для запуска Тестов
 
 1) Соберите docker-compose командой "docker-compose -f docker-compose-test.yml build"
 2) Запустите docker-compose командой "docker-compose -f docker-compose-test.yml up"
