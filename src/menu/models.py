@@ -3,8 +3,8 @@ import uuid
 from sqlalchemy import UUID, Column, ForeignKey, String
 from sqlalchemy.orm import DeclarativeBase
 
-from src.menu.schemas import GetDish, GetMenu, GetSubmenu
-
+from src.menu.schemas import GetDish, GetMenu, GetSubmenu, AllMenu, AllDish, AllSubmenu
+from sqlalchemy.orm import relationship
 
 class Base(DeclarativeBase):
     pass
@@ -17,6 +17,8 @@ class Menu(Base):
     title = Column(String(30), unique=True)
     description = Column(String)
 
+    submenus = relationship('Submenu', back_populates='parent')
+
     def json_mapping(self, item: tuple) -> GetMenu:
         return GetMenu(
             id=self.id,
@@ -24,6 +26,28 @@ class Menu(Base):
             description=self.description,
             submenus_count=item[-2],
             dishes_count=item[-1]
+        )
+    
+    def json_mapping_all(self) -> AllMenu:
+        return AllMenu(
+            id=self.id,
+            title=self.title,
+            description=self.description,
+            submenus=[
+                AllSubmenu(
+                    id=submenu.id,
+                    title=submenu.title,
+                    description=submenu.description,
+                    dishes=[
+                        AllDish(
+                            id=dish.id,
+                            title=dish.title,
+                            description=dish.description,
+                            price=dish.price
+                        ) for dish in submenu.dishes
+                    ]
+                ) for submenu in self.submenus
+            ],
         )
 
 
@@ -34,6 +58,8 @@ class Submenu(Base):
     title = Column(String(30), unique=True)
     description = Column(String)
     menu_id = Column(UUID(as_uuid=True), ForeignKey('menu.id', ondelete='CASCADE'))
+    dishes = relationship('Dish', back_populates='parent')
+    parent = relationship('Menu', back_populates='submenus')  
 
     def json_mapping(self, item: tuple) -> GetSubmenu:
         return GetSubmenu(
@@ -53,6 +79,7 @@ class Dish(Base):
     description = Column(String)
     price = Column(String)
     submenu_id = Column(UUID(as_uuid=True), ForeignKey('submenu.id', ondelete='CASCADE'))
+    parent = relationship('Submenu', back_populates='dishes')  
 
     def json_mapping(self, item=None) -> GetDish:
         return GetDish(
@@ -62,3 +89,5 @@ class Dish(Base):
             price=self.price,
             submenu_id=self.submenu_id
         )
+    
+    

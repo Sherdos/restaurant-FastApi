@@ -47,3 +47,21 @@ class CreateMenu(Base):
 
 class CreateDish(Base):
     price: str
+
+
+
+
+'''
+
+ALL
+
+'''
+
+class AllDish(BaseGet):
+    price:str
+
+class AllSubmenu(BaseGet):
+    dishes:list[AllDish]
+
+class AllMenu(BaseGet):
+    submenus:list[AllSubmenu]

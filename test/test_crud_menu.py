@@ -2,40 +2,49 @@ from httpx import AsyncClient
 
 
 class TestMenu:
+
     def setup_class(self):
         self.id = None
         self.title = None
         self.description = None
 
-    async def test_crud_menu(self, ac: AsyncClient, menu_data, update_menu_data):
 
-        menu_list = await ac.get('/api/v1/menus/')
-        assert menu_list.status_code == 200
-        assert menu_list.json() == []
 
-        result = await ac.post('/api/v1/menus/', json=menu_data)
+    async def test_create_menu(self, ac: AsyncClient, menu_data):
+        result = await ac.post('/api/v1/menus', json=menu_data)
         assert result.status_code == 201
-        self.id = result.json()['id']
+        self.__class__.id = result.json()['id']
+        self.__class__.title = result.json()['title']
+        self.__class__.description = result.json()['description']
 
-        self.title = result.json()['title']
-        self.description = result.json()['description']
 
-        menu = await ac.get(f'/api/v1/menus/{self.id}')
+    async def test_get_menu(self, ac: AsyncClient):
+        menu = await ac.get(f'/api/v1/menus/{self.__class__.id}')
         assert menu.status_code == 200
-        assert self.title == menu.json()['title']
-        assert self.description == menu.json()['description']
+        assert self.__class__.title == menu.json()['title']
+        assert self.__class__.description == menu.json()['description']
 
-        result = await ac.patch(f'/api/v1/menus/{self.id}', json=update_menu_data)
+
+    async def test_update_menu(self, ac: AsyncClient, update_menu_data):
+        result = await ac.patch(f'/api/v1/menus/{self.__class__.id}', json=update_menu_data)
         assert result.status_code == 200
-        assert self.title != result.json()['title']
-        assert self.description != result.json()['description']
+        assert self.__class__.title != result.json()['title']
+        assert self.__class__.description != result.json()['description']
 
-        self.title = result.json()['title']
-        self.description = result.json()['description']
+        self.__class__.title = result.json()['title']
+        self.__class__.description = result.json()['description']
 
-        result = await ac.delete(f'/api/v1/menus/{self.id}')
+
+    async def test_delete_menu(self, ac: AsyncClient):
+        result = await ac.delete(f'/api/v1/menus/{self.__class__.id}')
         assert result.status_code == 200
 
-        menu_list = await ac.get('/api/v1/menus/')
+
+    async def test_get_all_menus(self, ac: AsyncClient):
+        menu_list = await ac.get('/api/v1/menus')
         assert menu_list.status_code == 200
         assert menu_list.json() == []
+
+
+
+

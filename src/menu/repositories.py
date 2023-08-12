@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_async_session
 from src.menu.base.base_repository import BaseRepository
 from src.menu.models import Dish, Menu, Submenu
+from sqlalchemy.orm import selectinload
 
 
 class MenuRepository(BaseRepository):
@@ -20,6 +21,17 @@ class MenuRepository(BaseRepository):
             .outerjoin(Submenu, Menu.id == Submenu.menu_id) \
             .outerjoin(Dish, Submenu.id == Dish.submenu_id)
         self.name = 'menu'
+
+    async def all_menu(self) -> list[tuple[Menu]]:
+        result = await self.session.execute(
+            select(Menu).
+            order_by(Menu.id).
+            options(
+                selectinload(Menu.submenus).
+                selectinload(Submenu.dishes)
+            )
+        )
+        return result.all()
 
 
 class SubmenuRepository(BaseRepository):

@@ -1,78 +1,61 @@
 from httpx import AsyncClient
 
-menu_id = ''
-submenu_id = ''
+class TestCountingSubmenusAndDishes:
+
+    def setup_class(self):
+        self.menu_id = ''
+        self.submenu_id = ''
 
 
-async def test_create_all_object(ac: AsyncClient, menu_data, submenu_data, dish_data):
-
-    global menu_id
-    global submenu_id
-
-    result_menu = await ac.post('/api/v1/menus/', json=menu_data)
-
-    menu_id = result_menu.json()['id']
-
-    result_submenu = await ac.post(f'/api/v1/menus/{menu_id}/submenus', json=submenu_data)
-
-    submenu_id = result_submenu.json()['id']
-
-    await ac.post(f'/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes', json=dish_data)
 
 
-async def test_get_specific_menu(ac: AsyncClient):
-    result = await ac.get(f'/api/v1/menus/{menu_id}')
+    async def test_count(self, ac: AsyncClient, menu_data:dict, submenu_data:dict, dish_data:dict) -> None:
 
-    assert result.status_code == 200
-    assert menu_id == result.json()['id']
-    assert 1 == result.json()['dishes_count']
-    assert 1 == result.json()['submenus_count']
+        result_menu = await ac.post('/api/v1/menus', json=menu_data)
+        assert result_menu.status_code == 201
+        self.menu_id = result_menu.json()['id']
 
+        result_submenu = await ac.post(f'/api/v1/menus/{self.menu_id}/submenus', json=submenu_data)
+        assert result_submenu.status_code == 201
+        self.submenu_id = result_submenu.json()['id']
 
-async def test_get_specific_submenu(ac: AsyncClient):
-    result = await ac.get(f'/api/v1/menus/{menu_id}/submenus/{submenu_id}')
+        result_dish = await ac.post(f'/api/v1/menus/{self.menu_id}/submenus/{self.submenu_id}/dishes', json=dish_data)
+        assert result_dish.status_code == 201
 
-    assert result.status_code == 200
-    assert submenu_id == result.json()['id']
-    assert 1 == result.json()['dishes_count']
+        menu = await ac.get(f'/api/v1/menus/{self.menu_id}')
+        assert menu.status_code == 200
+        assert self.menu_id == menu.json()['id']
+        assert 1 == menu.json()['dishes_count']
+        assert 1 == menu.json()['submenus_count']
 
-
-async def test_delete_submenu(ac: AsyncClient):
-
-    result = await ac.delete(f'/api/v1/menus/{menu_id}/submenus/{submenu_id}')
-    assert result.status_code == 200
-
-
-async def test_get_list_submenu(ac: AsyncClient):
-    result = await ac.get(f'/api/v1/menus/{menu_id}/submenus')
-    assert result.status_code == 200
-    assert len(result.json()) == 0
+        submenu = await ac.get(f'/api/v1/menus/{self.menu_id}/submenus/{self.submenu_id}')
+        assert submenu.status_code == 200
+        assert self.submenu_id == submenu.json()['id']
+        assert 1 == submenu.json()['dishes_count']
 
 
-async def test_get_list_dish(ac: AsyncClient):
-    result = await ac.get(f'/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes')
-    assert result.status_code == 200
-    assert len(result.json()) == 0
+        delete_submenu = await ac.delete(f'/api/v1/menus/{self.menu_id}/submenus/{self.submenu_id}')
+        assert delete_submenu.status_code == 200
+
+        submenu_list = await ac.get(f'/api/v1/menus/{self.menu_id}/submenus')
+        assert submenu_list.status_code == 200
+        assert len(submenu_list.json()) == 0
+
+        dish_list = await ac.get(f'/api/v1/menus/{self.menu_id}/submenus/{self.submenu_id}/dishes')
+        assert dish_list.status_code == 200
+        assert len(dish_list.json()) == 0
+
+        menu = await ac.get(f'/api/v1/menus/{self.menu_id}')
+        assert menu.status_code == 200
+        assert self.menu_id == menu.json()['id']
+        assert 0 == menu.json()['submenus_count']
+        assert 0 == menu.json()['dishes_count']
 
 
-async def test_get_specific_menu_empty(ac: AsyncClient):
-    result = await ac.get(f'/api/v1/menus/{menu_id}')
-
-    assert result.status_code == 200
-
-    assert menu_id == result.json()['id']
-    assert 0 == result.json()['submenus_count']
-    assert 0 == result.json()['dishes_count']
+        delete_menu = await ac.delete(f'/api/v1/menus/{self.menu_id}')
+        assert delete_menu.status_code == 200
 
 
-async def test_delete_menu(ac: AsyncClient):
-
-    result = await ac.delete(f'/api/v1/menus/{menu_id}')
-    assert result.status_code == 200
-
-
-async def test_get_list_menu(ac: AsyncClient):
-
-    result = await ac.get('/api/v1/menus/')
-    assert result.status_code == 200
-    assert len(result.json()) == 0
+        empty_list = await ac.get('/api/v1/menus')
+        assert empty_list.status_code == 200
+        assert len(empty_list.json()) == 0
