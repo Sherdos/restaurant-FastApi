@@ -5,7 +5,7 @@ import pandas as pd
 from src.menu.repositories import DishRepository, MenuRepository, SubmenuRepository
 
 
-def from_xlsx_to_dict():
+def from_xlsx_to_dict() -> tuple[list, list, list]:
     data_frame = pd.read_excel('admin/Menu.xlsx')
     data = data_frame
     menu_structure = []
@@ -47,20 +47,10 @@ def from_xlsx_to_dict():
     return menu_structure, submenu_structure, dish_structure
 
 
-def get_reposytory(index):
+def get_reposytory(index: int):
     if index == 0:
         return MenuRepository
     elif index == 1:
         return SubmenuRepository
     elif index == 2:
         return DishRepository
-
-
-def get_row_title(index):
-
-    if index == 0:
-        return 1
-    elif index == 1:
-        return 2
-    elif index == 2:
-        return 3

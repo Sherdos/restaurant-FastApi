@@ -38,10 +38,6 @@ services:
     image: rabbitmq:latest
     container_name: rabbit
     env_file: .env-non-dev
-    ports:
-      - 5672:5672
-    expose:
-      - 5672
 
   celery:
     build:

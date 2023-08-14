@@ -3,9 +3,13 @@ import asyncio
 from celery import Celery
 
 from src.admin_xlsx.admin import update_admin
-from src.config import RABBITMQ_DEFAULT_PASS, RABBITMQ_DEFAULT_USER
+from src.config import (
+    RABBITMQ_DEFAULT_HOST,
+    RABBITMQ_DEFAULT_PASS,
+    RABBITMQ_DEFAULT_USER,
+)
 
-celery = Celery('tasks', broker=f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}@localhost:5672')
+celery = Celery('tasks', broker=f'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}@{RABBITMQ_DEFAULT_HOST}:5672')
 
 
 celery.conf.imports = ('src.admin_xlsx.tasks',)
