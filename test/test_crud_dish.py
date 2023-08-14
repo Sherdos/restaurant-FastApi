@@ -11,7 +11,7 @@ class TestDish:
         self.dish_submenu_id = None
         self.dish_submenu_menu_id = None
 
-    async def test_create_dish(self, ac:AsyncClient, menu_data, submenu_data, dish_data):
+    async def test_create_dish(self, ac: AsyncClient, menu_data, submenu_data, dish_data):
         result_menu = await ac.post('/api/v1/menus', json=menu_data)
         self.__class__.dish_submenu_menu_id = result_menu.json()['id']
 
@@ -26,7 +26,7 @@ class TestDish:
         self.__class__.dish_description = result.json()['description']
         self.__class__.dish_price = result.json()['price']
 
-    async def test_get_dish(self, ac:AsyncClient):
+    async def test_get_dish(self, ac: AsyncClient):
 
         result = await ac.get(f'/api/v1/menus/{self.dish_submenu_menu_id}/submenus/{self.dish_submenu_id}/dishes/{self.dish_id}')
         assert result.status_code == 200
@@ -35,7 +35,7 @@ class TestDish:
         assert self.dish_description == result.json()['description']
         assert self.dish_price == result.json()['price']
 
-    async def test_update_dish(self, ac:AsyncClient, update_dish_data):
+    async def test_update_dish(self, ac: AsyncClient, update_dish_data):
         result = await ac.patch(f'/api/v1/menus/{self.dish_submenu_menu_id}/submenus/{self.dish_submenu_id}/dishes/{self.dish_id}', json=update_dish_data)
         assert result.status_code == 200
 
@@ -47,15 +47,14 @@ class TestDish:
         self.dish_description = result.json()['description']
         self.dish_price = result.json()['price']
 
-    async def test_delete_dish(self, ac:AsyncClient):
+    async def test_delete_dish(self, ac: AsyncClient):
         result = await ac.delete(f'/api/v1/menus/{self.dish_submenu_menu_id}/submenus/{self.dish_submenu_id}/dishes/{self.dish_id}')
         assert result.status_code == 200
 
-    async def test_empty_dish_list_and_clean(self, ac:AsyncClient):
+    async def test_empty_dish_list_and_clean(self, ac: AsyncClient):
         result = await ac.get(f'/api/v1/menus/{self.dish_submenu_menu_id}/submenus/{self.dish_submenu_id}/dishes')
         assert result.status_code == 200
         assert len(result.json()) == 0
 
         result = await ac.delete(f'/api/v1/menus/{self.dish_submenu_menu_id}')
         assert result.status_code == 200
-

@@ -5,16 +5,18 @@ from starlette import status
 
 from src.menu.services import DishService, MenuService, SubmenuService
 
-from .schemas import CreateDish, CreateMenu, GetDish, GetMenu, GetSubmenu, AllMenu
+from .schemas import AllMenu, CreateDish, CreateMenu, GetDish, GetMenu, GetSubmenu
 
 router_menu = APIRouter(
     prefix='/api/v1/menus',
     tags=['Menu']
 )
 
+
 @router_menu.get('/all', response_model=list[AllMenu])
 async def get_menus_all(menu: MenuService = Depends()) -> list[AllMenu]:
     return await menu.all_menu()
+
 
 @router_menu.get('', response_model=list[GetMenu])
 async def get_menus(menu: MenuService = Depends()) -> list[GetMenu]:
@@ -39,8 +41,6 @@ async def update_menu(menu_id: UUID, updated_menu: CreateMenu, menu: MenuService
 @router_menu.delete('/{menu_id}')
 async def delete_menu(menu_id: UUID, menu: MenuService = Depends()) -> dict:
     return await menu.delete(menu_id)
-
-
 
 
 router_submenu = APIRouter(
@@ -79,8 +79,6 @@ async def update_submenu(submenu_id: UUID, updated_menu: CreateMenu, submenu: Su
 @router_submenu.delete('/{submenu_id}')
 async def delete_submenu(submenu_id: UUID, submenu: SubmenuService = Depends()) -> dict:
     return await submenu.delete(submenu_id)
-
-
 
 
 router_dish = APIRouter(

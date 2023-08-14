@@ -1,13 +1,14 @@
-from uuid import UUID
-
 from fastapi import Depends
 from sqlalchemy import and_, distinct, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.database import get_async_session
 from src.menu.base.base_repository import BaseRepository
 from src.menu.models import Dish, Menu, Submenu
-from sqlalchemy.orm import selectinload
+
+# if not await is_title_unique(self.session, kwargs['title'], self.model):
+#             raise HTTPException(status_code=404, detail='the item already exists')
 
 
 class MenuRepository(BaseRepository):
@@ -35,7 +36,7 @@ class MenuRepository(BaseRepository):
 
 
 class SubmenuRepository(BaseRepository):
-    def __init__(self, menu_id: UUID, session: AsyncSession = Depends(get_async_session)) -> None:
+    def __init__(self, menu_id='', session: AsyncSession = Depends(get_async_session)) -> None:
         super().__init__(session=session)
         self.model = Submenu
         self.query = select(
@@ -47,7 +48,7 @@ class SubmenuRepository(BaseRepository):
 
 class DishRepository(BaseRepository):
 
-    def __init__(self, menu_id: UUID, submenu_id: UUID, session: AsyncSession = Depends(get_async_session)) -> None:
+    def __init__(self, menu_id='', submenu_id='', session: AsyncSession = Depends(get_async_session)) -> None:
         super().__init__(session=session)
         self.model = Dish
         self.menu_id = menu_id

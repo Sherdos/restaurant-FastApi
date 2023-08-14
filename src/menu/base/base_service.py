@@ -3,20 +3,16 @@ from uuid import UUID
 from fastapi import BackgroundTasks
 
 from src.menu.repositories import BaseRepository
-from src.menu.schemas import Base, AllMenu
+from src.menu.schemas import Base
 from src.menu.utils import clean_cach
 
 
 class BaseService():
 
-    def __init__(self, background_tasks:BackgroundTasks, db_repository: BaseRepository, cache_conf: list) -> None:
+    def __init__(self, background_tasks: BackgroundTasks, db_repository: BaseRepository, cache_conf: list) -> None:
         self.db_repository = db_repository
         self.cache_conf = cache_conf
         self.background_tasks = background_tasks
-
-    async def all_menu(self) -> list[AllMenu]:
-        result = await self.db_repository.all_menu()
-        return [i[0].json_mapping_all() for i in result]
 
     async def all(self) -> list[Base]:
         result = await self.db_repository.get_all()

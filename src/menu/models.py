@@ -1,10 +1,10 @@
 import uuid
 
 from sqlalchemy import UUID, Column, ForeignKey, String
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, relationship
 
-from src.menu.schemas import GetDish, GetMenu, GetSubmenu, AllMenu, AllDish, AllSubmenu
-from sqlalchemy.orm import relationship
+from src.menu.schemas import AllDish, AllMenu, AllSubmenu, GetDish, GetMenu, GetSubmenu
+
 
 class Base(DeclarativeBase):
     pass
@@ -27,7 +27,7 @@ class Menu(Base):
             submenus_count=item[-2],
             dishes_count=item[-1]
         )
-    
+
     def json_mapping_all(self) -> AllMenu:
         return AllMenu(
             id=self.id,
@@ -59,7 +59,7 @@ class Submenu(Base):
     description = Column(String)
     menu_id = Column(UUID(as_uuid=True), ForeignKey('menu.id', ondelete='CASCADE'))
     dishes = relationship('Dish', back_populates='parent')
-    parent = relationship('Menu', back_populates='submenus')  
+    parent = relationship('Menu', back_populates='submenus')
 
     def json_mapping(self, item: tuple) -> GetSubmenu:
         return GetSubmenu(
@@ -79,7 +79,7 @@ class Dish(Base):
     description = Column(String)
     price = Column(String)
     submenu_id = Column(UUID(as_uuid=True), ForeignKey('submenu.id', ondelete='CASCADE'))
-    parent = relationship('Submenu', back_populates='dishes')  
+    parent = relationship('Submenu', back_populates='dishes')
 
     def json_mapping(self, item=None) -> GetDish:
         return GetDish(
@@ -89,5 +89,3 @@ class Dish(Base):
             price=self.price,
             submenu_id=self.submenu_id
         )
-    
-    

@@ -34,6 +34,25 @@ services:
       - db
       - redis
 
+  rabbit:
+    image: rabbitmq:latest
+    container_name: rabbit
+    env_file: .env-non-dev
+    ports:
+      - 5672:5672
+    expose:
+      - 5672
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .env-non-dev
+    container_name: celery
+    command: ['/restaurant_fastapi/docker/celery.sh']
+    depends_on:
+      - rabbit
+
 volumes:
   postgres_data:
     driver: local

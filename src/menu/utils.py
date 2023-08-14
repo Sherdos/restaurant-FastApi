@@ -28,3 +28,6 @@ def price_rounding(dish: GetDish) -> GetDish:
 async def clean_cach(*arg) -> None:
     for i in arg:
         await FastAPICache.clear(i)
+
+
+# def save_file(title, new, row):

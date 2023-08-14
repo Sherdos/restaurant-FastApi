@@ -49,19 +49,20 @@ class CreateDish(Base):
     price: str
 
 
-
-
 '''
 
 ALL
 
 '''
 
+
 class AllDish(BaseGet):
-    price:str
+    price: str
+
 
 class AllSubmenu(BaseGet):
-    dishes:list[AllDish]
+    dishes: list[AllDish]
+
 
 class AllMenu(BaseGet):
-    submenus:list[AllSubmenu]
+    submenus: list[AllSubmenu]

@@ -18,6 +18,10 @@ class BaseRepository():
         self.query = select()
         self.name: str
 
+    # Это нужно чтобы pre-commit не ругался
+    async def all_menu(self):
+        pass
+
     async def get_all(self) -> list[tuple[Base]]:
         result = await self.session.execute(self.query.group_by(self.model.id))
         return result.all()
@@ -33,6 +37,7 @@ class BaseRepository():
 
         if not await is_title_unique(self.session, kwargs['title'], self.model):
             raise HTTPException(status_code=404, detail='the item already exists')
+
         query = await self.session.execute(insert(self.model).values(**kwargs))
         item_id = query.inserted_primary_key[0]
 

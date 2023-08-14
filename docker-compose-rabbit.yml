@@ -5,8 +5,6 @@ services:
     image: rabbitmq:latest
     restart: always
     container_name: rabbit
-    environment:
-      - RABBITMQ_DEFAULT_USER=admin
-      - RABBITMQ_DEFAULT_PASS=12345
+    env_file: .env
     ports:
       - 5672:5672

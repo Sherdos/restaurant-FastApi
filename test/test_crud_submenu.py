@@ -9,7 +9,7 @@ class TestSubmenu:
         self.submenu_description = None
         self.submenu_menu_id = None
 
-    async def test_create_submenu(self, ac:AsyncClient, menu_data, submenu_data):
+    async def test_create_submenu(self, ac: AsyncClient, menu_data, submenu_data):
         result_menu = await ac.post('/api/v1/menus', json=menu_data)
 
         assert result_menu.status_code == 201
@@ -22,14 +22,14 @@ class TestSubmenu:
         self.__class__.submenu_title = result.json()['title']
         self.__class__.submenu_description = result.json()['description']
 
-    async def test_get_submenu(self, ac:AsyncClient):
+    async def test_get_submenu(self, ac: AsyncClient):
         result = await ac.get(f'/api/v1/menus/{self.submenu_menu_id}/submenus/{self.submenu_id}')
         assert result.status_code == 200
         assert self.submenu_id == result.json()['id']
         assert self.submenu_title == result.json()['title']
         assert self.submenu_description == result.json()['description']
 
-    async def test_update_submenu(self, ac:AsyncClient, update_submenu_data):
+    async def test_update_submenu(self, ac: AsyncClient, update_submenu_data):
 
         result = await ac.patch(f'/api/v1/menus/{self.submenu_menu_id}/submenus/{self.submenu_id}', json=update_submenu_data)
         assert result.status_code == 200
@@ -40,11 +40,9 @@ class TestSubmenu:
         self.__class__.submenu_title = result.json()['title']
         self.__class__.submenu_description = result.json()['description']
 
-
-    async def test_delete_submenu(self, ac:AsyncClient):
+    async def test_delete_submenu(self, ac: AsyncClient):
         result = await ac.delete(f'/api/v1/menus/{self.submenu_menu_id}/submenus/{self.submenu_id}')
         assert result.status_code == 200
-
 
     async def test_empty_submenu_list_and_clean(self, ac: AsyncClient, ):
         result = await ac.get(f'/api/v1/menus/{self.submenu_menu_id}/submenus')

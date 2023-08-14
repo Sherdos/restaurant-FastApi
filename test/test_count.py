@@ -1,15 +1,13 @@
 from httpx import AsyncClient
 
+
 class TestCountingSubmenusAndDishes:
 
     def setup_class(self):
         self.menu_id = ''
         self.submenu_id = ''
 
-
-
-
-    async def test_count(self, ac: AsyncClient, menu_data:dict, submenu_data:dict, dish_data:dict) -> None:
+    async def test_count(self, ac: AsyncClient, menu_data: dict, submenu_data: dict, dish_data: dict) -> None:
 
         result_menu = await ac.post('/api/v1/menus', json=menu_data)
         assert result_menu.status_code == 201
@@ -33,7 +31,6 @@ class TestCountingSubmenusAndDishes:
         assert self.submenu_id == submenu.json()['id']
         assert 1 == submenu.json()['dishes_count']
 
-
         delete_submenu = await ac.delete(f'/api/v1/menus/{self.menu_id}/submenus/{self.submenu_id}')
         assert delete_submenu.status_code == 200
 
@@ -51,10 +48,8 @@ class TestCountingSubmenusAndDishes:
         assert 0 == menu.json()['submenus_count']
         assert 0 == menu.json()['dishes_count']
 
-
         delete_menu = await ac.delete(f'/api/v1/menus/{self.menu_id}')
         assert delete_menu.status_code == 200
-
 
         empty_list = await ac.get('/api/v1/menus')
         assert empty_list.status_code == 200
