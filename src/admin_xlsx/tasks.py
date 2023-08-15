@@ -18,7 +18,7 @@ celery.conf.imports = ('src.admin_xlsx.tasks',)
 @celery.task
 def update_admin_xlsx():
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(update_admin())
+    print(loop.run_until_complete(update_admin()))
 
 
 celery.conf.beat_schedule = {

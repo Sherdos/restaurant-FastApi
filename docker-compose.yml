@@ -30,24 +30,43 @@ services:
     ports:
       - 8000:8000
 
+
     depends_on:
       - db
       - redis
+    
 
   rabbit:
     image: rabbitmq:latest
     container_name: rabbit
     env_file: .env-non-dev
 
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: 'always'
+    env_file: .env-non-dev
+    volumes:
+      - .:/app
+    container_name: worker_celery
+    command: ['/restaurant_fastapi/docker/celery.sh', 'worker']
+    depends_on:
+      - rabbit
+
   celery:
     build:
       context: .
       dockerfile: Dockerfile
+    restart: 'always'
+    volumes:
+      - .:/app
     env_file: .env-non-dev
     container_name: celery
-    command: ['/restaurant_fastapi/docker/celery.sh']
+    command: ['/restaurant_fastapi/docker/celery.sh', 'admin']
     depends_on:
       - rabbit
+      - worker
 
 volumes:
   postgres_data:
