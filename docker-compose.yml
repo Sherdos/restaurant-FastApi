@@ -34,7 +34,7 @@ services:
     depends_on:
       - db
       - redis
-    
+
 
   rabbit:
     image: rabbitmq:latest
