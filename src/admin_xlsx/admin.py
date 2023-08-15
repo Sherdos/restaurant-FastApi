@@ -49,4 +49,3 @@ async def update_admin():
 
                 data_frame.loc[data_frame['Unnamed: 7'].notna(), 'Unnamed: 7'] = None
     data_frame.to_excel('admin/Menu.xlsx', index=False)
-    return data
