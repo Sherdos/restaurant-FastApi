@@ -18,6 +18,7 @@ class AdminXLSX():
 
     async def update(self, session: AsyncSession, id: UUID, dict_obj: dict) -> None:
         object = self.repository(session=session)
+        print(dict_obj)
         await object.update(id, **dict_obj)
 
     async def delete(self, session: AsyncSession, id: UUID) -> None:
@@ -40,7 +41,8 @@ async def update_admin():
                         data_frame[f'Unnamed: {index+1}'] == dict_obj['title'], f'Unnamed: {index}'
                     ] = menu_id
                 elif move == 'U':
-                    await admin.update(session=session, id=dict_obj['id'], dict_obj=dict_obj)
+                    id = dict_obj.pop('id')
+                    await admin.update(session=session, id=id, dict_obj=dict_obj)
                 elif move == 'D':
                     await admin.delete(session=session, id=dict_obj['id'])
                     condition = data_frame[f'Unnamed: {index}'] == dict_obj['id']
@@ -48,4 +50,5 @@ async def update_admin():
                     data_frame = data_frame.drop(indexes)
 
                 data_frame.loc[data_frame['Unnamed: 7'].notna(), 'Unnamed: 7'] = None
+    data_frame.to_excel('admin/MenuPre.xlsx', index=False)
     data_frame.to_excel('admin/Menu.xlsx', index=False)
